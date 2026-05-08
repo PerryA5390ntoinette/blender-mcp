@@ -53,6 +53,8 @@ The system consists of two main components:
 ## Installation
 
 > **Personal note:** I tested this on Blender 4.1 and Python 3.11 — works great. The uv install step is easy to skip but don't, it'll cause confusing errors later.
+>
+> **My setup:** Running on Ubuntu 22.04 with Blender 4.2. Had no issues. On Linux, just use `pip install uv` or the curl installer below — no need for brew or powershell.
 
 ### Prerequisites
 
@@ -75,10 +77,4 @@ $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 [Environment]::SetEnvironmentVariable("Path", "$userPath;$localBin", "User")
 ```
 
-Otherwise installation instructions are on their website: [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
-
-**⚠️ Do not proceed before installing UV**
-
-### Environment Variables
-
-The following environment variables can be used to configure the Blend
+Otherwise installation instructions are on their website: [Install uv](https://docs.astral.sh/uv/getting-s
