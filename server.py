@@ -84,31 +84,17 @@ class BlenderConnection:
             raise ValueError(f"Invalid JSON response from Blender: {raw!r}") from exc
 
     def _receive_response(self) -> str:
-        """Read a newline-terminated response from the socket."""
+        """Read a newline-terminated response from the socket.
+
+        Accumulates chunks until a newline is found, which signals the end
+        of a complete JSON message from the Blender addon.
+        """
         chunks: list[bytes] = []
         while True:
             chunk = self._socket.recv(BUFFER_SIZE)  # type: ignore[union-attr]
             if not chunk:
-                raise ConnectionError("Blender closed the connection unexpectedly.")
+                raise OSError("Connection closed by Blender before response was complete.")
             chunks.append(chunk)
             if b"\n" in chunk:
                 break
         return b"".join(chunks).decode("utf-8").strip()
-
-    @property
-    def is_connected(self) -> bool:
-        """Return True if a socket connection is currently open."""
-        return self._socket is not None
-
-
-# Module-level singleton used by tool handlers
-_blender_connection: BlenderConnection | None = None
-
-
-def get_connection(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> BlenderConnection:
-    """Return the shared BlenderConnection, creating and connecting it if necessary."""
-    global _blender_connection
-    if _blender_connection is None or not _blender_connection.is_connected:
-        _blender_connection = BlenderConnection(host=host, port=port)
-        _blender_connection.connect()
-    return _blender_connection
