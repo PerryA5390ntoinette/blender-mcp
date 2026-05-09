@@ -48,7 +48,8 @@ class BlenderMCPServer:
         self._listen_backlog = 5
         # Socket accept timeout in seconds. Lower values make the server more
         # responsive to stop() calls; higher values reduce CPU wake-ups.
-        self._accept_timeout = 0.5
+        # Reduced from 0.5 to 0.25 for snappier shutdown response.
+        self._accept_timeout = 0.25
 
     def start(self):
         if self.running:
@@ -89,7 +90,9 @@ class BlenderMCPServer:
         if self.server_thread:
             try:
                 if self.server_thread.is_alive():
-                    self.server_thread.join(timeout=1.0)
+                    # Increased join timeout slightly to give the thread a fair
+                    # chance to exit cleanly after the socket is closed.
+                    self.server_thread.join(timeout=2.0)
             except:
                 pass
             self.server_thread = None
@@ -99,10 +102,4 @@ class BlenderMCPServer:
     def _server_loop(self):
         """Main server loop in a separate thread"""
         print("Server thread started")
-        self.socket.settimeout(self._accept_timeout)  # Timeout to allow for stopping
-
-        while self.running:
-            try:
-                # Accept new connection
-                try:
-             
+   
